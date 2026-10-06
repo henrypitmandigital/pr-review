@@ -1,0 +1,74 @@
+[
+  {
+    "id": "public-dto-buggy",
+    "diff": "diff --git a/packages/schemas/src/public/review-example.ts b/packages/schemas/src/public/review-example.ts\nnew file mode 100644\n--- /dev/null\n+++ b/packages/schemas/src/public/review-example.ts\n@@ -0,0 +1,4 @@\n+export type Candidate = { id: string; publicName: string; privateEvidence: string; llmCost: number };\n+export function toPublic(candidate: Candidate) {\n+  return { ...candidate };\n+}\ndiff --git a/apps/web/route-entry/public/review-example.ts b/apps/web/route-entry/public/review-example.ts\nnew file mode 100644\n--- /dev/null\n+++ b/apps/web/route-entry/public/review-example.ts\n@@ -0,0 +1,4 @@\n+import { toPublic, type Candidate } from \"../../../../packages/schemas/src/public/review-example\";\n+export function publicResponse(candidate: Candidate) {\n+  return Response.json(toPublic(candidate));\n+}\n",
+    "expected": "The public response spreads Candidate, exposing privateEvidence and llmCost. Explicitly project only id and publicName at the public DTO boundary.",
+    "adjudication_notes": [
+      "Synthetic minimal public DTO/route case based on the repository no-leak boundary. The supplied type is complete; Response.json serializes its enumerable properties. This is not a historical measured defect."
+    ],
+    "judge_control": {
+      "review": {
+        "key_issues_to_review": [
+          {
+            "issue": "The response exposes privateEvidence and llmCost because toPublic spreads the entire candidate."
+          }
+        ]
+      },
+      "claims": "supported"
+    }
+  },
+  {
+    "id": "public-dto-fixed",
+    "diff": "diff --git a/packages/schemas/src/public/review-example.ts b/packages/schemas/src/public/review-example.ts\nnew file mode 100644\n--- /dev/null\n+++ b/packages/schemas/src/public/review-example.ts\n@@ -0,0 +1,4 @@\n+export type Candidate = { id: string; publicName: string; privateEvidence: string; llmCost: number };\n+export function toPublic(candidate: Candidate) {\n+  return { id: candidate.id, publicName: candidate.publicName };\n+}\ndiff --git a/apps/web/route-entry/public/review-example.ts b/apps/web/route-entry/public/review-example.ts\nnew file mode 100644\n--- /dev/null\n+++ b/apps/web/route-entry/public/review-example.ts\n@@ -0,0 +1,4 @@\n+import { toPublic, type Candidate } from \"../../../../packages/schemas/src/public/review-example\";\n+export function publicResponse(candidate: Candidate) {\n+  return Response.json(toPublic(candidate));\n+}\n",
+    "expected": null,
+    "adjudication_notes": [
+      "Synthetic minimal public DTO/route case based on the repository no-leak boundary. The supplied type is complete; Response.json serializes its enumerable properties. This is not a historical measured defect."
+    ],
+    "judge_control": {
+      "review": {
+        "key_issues_to_review": [
+          {
+            "issue": "The response exposes privateEvidence and llmCost because toPublic spreads the entire candidate."
+          }
+        ]
+      },
+      "claims": "unsupported"
+    }
+  },
+  {
+    "id": "publication-permission-buggy",
+    "diff": "diff --git a/packages/agent-contracts/src/review-permission.ts b/packages/agent-contracts/src/review-permission.ts\nnew file mode 100644\n--- /dev/null\n+++ b/packages/agent-contracts/src/review-permission.ts\n@@ -0,0 +1,4 @@\n+export type Permission = { granted: boolean; expiresAt: number; candidateId: string };\n+export function mayPublish(p: Permission, candidateId: string, now: number) {\n+  return p.granted;\n+}\ndiff --git a/packages/db/src/review-publisher.ts b/packages/db/src/review-publisher.ts\nnew file mode 100644\n--- /dev/null\n+++ b/packages/db/src/review-publisher.ts\n@@ -0,0 +1,5 @@\n+import { mayPublish, type Permission } from \"../../../packages/agent-contracts/src/review-permission\";\n+export async function publish(p: Permission, id: string, now: number, write: (id: string) => Promise<void>) {\n+  if (!mayPublish(p, id, now)) throw new Error(\"No current candidate permission\");\n+  await write(id);\n+}\n",
+    "expected": "The shared publisher trusts granted alone, so an expired permission or permission for a different candidate authorizes publication. Require matching candidateId and expiresAt greater than now before write.",
+    "adjudication_notes": [
+      "Synthetic minimal grant/publisher case reflecting candidate-specific finite publication authority. The permission type is complete; write is the supplied publication side effect. No database or fixture code executes."
+    ],
+    "judge_control": {
+      "review": {
+        "key_issues_to_review": [
+          {
+            "issue": "A granted permission for another candidate or an expired permission reaches write."
+          }
+        ]
+      },
+      "claims": "supported"
+    }
+  },
+  {
+    "id": "publication-permission-fixed",
+    "diff": "diff --git a/packages/agent-contracts/src/review-permission.ts b/packages/agent-contracts/src/review-permission.ts\nnew file mode 100644\n--- /dev/null\n+++ b/packages/agent-contracts/src/review-permission.ts\n@@ -0,0 +1,4 @@\n+export type Permission = { granted: boolean; expiresAt: number; candidateId: string };\n+export function mayPublish(p: Permission, candidateId: string, now: number) {\n+  return p.granted && p.candidateId === candidateId && p.expiresAt > now;\n+}\ndiff --git a/packages/db/src/review-publisher.ts b/packages/db/src/review-publisher.ts\nnew file mode 100644\n--- /dev/null\n+++ b/packages/db/src/review-publisher.ts\n@@ -0,0 +1,5 @@\n+import { mayPublish, type Permission } from \"../../../packages/agent-contracts/src/review-permission\";\n+export async function publish(p: Permission, id: string, now: number, write: (id: string) => Promise<void>) {\n+  if (!mayPublish(p, id, now)) throw new Error(\"No current candidate permission\");\n+  await write(id);\n+}\n",
+    "expected": null,
+    "adjudication_notes": [
+      "Synthetic minimal grant/publisher case reflecting candidate-specific finite publication authority. The permission type is complete; write is the supplied publication side effect. No database or fixture code executes."
+    ],
+    "judge_control": {
+      "review": {
+        "key_issues_to_review": [
+          {
+            "issue": "A granted permission for another candidate or an expired permission reaches write."
+          }
+        ]
+      },
+      "claims": "unsupported"
+    }
+  }
+]

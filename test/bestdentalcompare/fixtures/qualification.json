@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "repository": "profplum700/bestdentalcompare",
+  "ready": false,
+  "reason": "Historical labels are draft source-inspected snapshots. Independent adjudication and repository-native review measurement are pending. Automatic replacement is disabled.",
+  "required_for_ready": [
+    "Independent human/source adjudication of each buggy/fixed label and judge control",
+    "Record source SHA, paths/ranges and linked regression proof",
+    "Confirm interacting-file and risk-area representativeness; run native PR-Agent and typed grading under approved allowance"
+  ]
+}
