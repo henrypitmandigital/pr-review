@@ -1,0 +1,26 @@
+# .github/workflows/pr-review-policy.yml
+name: Fortnightly reviewer research
+
+on:
+  schedule:
+    - cron: '17 8 * * *'
+  workflow_dispatch:
+
+permissions: {}
+concurrency:
+  group: pr-review-policy-renewal
+  cancel-in-progress: false
+
+jobs:
+  renew:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    permissions:
+      contents: write
+    steps:
+      - uses: profplum700/pr-review/renew@v1
+        with:
+          openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
+          typesafe-api-key: ${{ secrets.TYPESAFE_API_KEY }}
+          max-call-usd: ${{ vars.PR_REVIEW_MAX_CALL_USD }}
