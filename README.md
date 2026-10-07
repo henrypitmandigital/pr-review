@@ -69,10 +69,21 @@ Controls carried by every repository:
    `qualification.json` (`{"schema":1,"repository":"owner/name","ready":true}`
    once the owner has adjudicated them). Without them the baseline reviews and
    renewal records research only.
-5. **Workflows.** Copy the three files in [`examples/`](examples/) into
+5. **Optional controls.**
+   - `review` and `renew` take `authorize-only: 'true'` for a secret-free job
+     that checks the requester before an approval-gated `environment` job; that
+     job calls the action again in full, so the requester is re-checked after
+     approval.
+   - `renew` also accepts `/review-policy` and `/review-policy-resume <run id>`
+     PR comments (exact text, write permission). Resuming continues a cycle
+     whose trusted run failed before inference and never replays a paid call
+     (`actions: read` needed). Dispatch input `resume-run-id` does the same.
+   - `renew` takes `package-manager: pnpm` where npm must not be used (pnpm
+     must already be on PATH).
+6. **Workflows.** Copy the three files in [`examples/`](examples/) into
    `.github/workflows/`. Adjust `runs-on`, `environment` or timeouts as the
    repository's own rules require; the actions do not depend on them.
-6. **`.pr_agent.toml` (optional).** Native PR-Agent settings; the `checks`
+7. **`.pr_agent.toml` (optional).** Native PR-Agent settings; the `checks`
    action rejects unknown keys and values that disagree with the config.
 
 ## Versioning

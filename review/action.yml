@@ -19,7 +19,16 @@ inputs:
   acknowledge:
     description: Add an eyes reaction once the commenter is authorised.
     default: 'false'
+  authorize-only:
+    description: >-
+      Only authorise (and optionally acknowledge), then stop. Use in a
+      secret-free job before an approval-gated environment job, which calls the
+      action again in full and so re-checks the commenter after approval.
+    default: 'false'
 outputs:
+  allowed:
+    description: Whether the comment is an authorised review request.
+    value: ${{ steps.authorize.outputs.allowed }}
   model:
     description: The reviewer that ran, or empty when no review ran.
     value: ${{ steps.select.outputs.model }}
@@ -45,7 +54,7 @@ runs:
     # Only the repository's config and fixtures, at the default-branch event
     # commit; never PR code. Kept out of the caller's own workspace files.
     - name: Checkout trusted repository config
-      if: steps.authorize.outputs.allowed == 'true'
+      if: steps.authorize.outputs.allowed == 'true' && inputs.authorize-only != 'true'
       uses: actions/checkout@v4
       with:
         ref: ${{ github.sha }}
@@ -56,7 +65,7 @@ runs:
 
     - name: Load accepted baseline or the period's qualified reviewer
       id: select
-      if: steps.authorize.outputs.allowed == 'true'
+      if: steps.authorize.outputs.allowed == 'true' && inputs.authorize-only != 'true'
       uses: actions/github-script@v8
       env:
         PR_REVIEW_LIB: ${{ github.action_path }}/../lib
@@ -82,7 +91,7 @@ runs:
 
     # PR-Agent reads PR contents via GitHub, never executes them.
     - name: Review with PR-Agent through OpenRouter
-      if: steps.authorize.outputs.allowed == 'true' && steps.select.outputs.model != ''
+      if: steps.authorize.outputs.allowed == 'true' && inputs.authorize-only != 'true' && steps.select.outputs.model != ''
       uses: The-PR-Agent/pr-agent@v0.46.0
       env:
         CONFIG__OUTPUT_RUN_DETAILS: 'true'
