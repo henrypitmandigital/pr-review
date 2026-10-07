@@ -15,6 +15,7 @@ control lives here, versioned, so all repositories get the same behaviour.
 | `review` | `issue_comment` (`created`) | `OPENROUTER_API_KEY` | Authorise the commenter, choose the reviewer, run PR-Agent once. |
 | `renew` | daily `schedule` + `workflow_dispatch` | `OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` | Every 14 days, research and evaluate a cheaper qualified reviewer. |
 | `checks` | `pull_request` on config changes | none | Validate config, fixtures and `.pr_agent.toml`; free catalog price plan. |
+| `calibrate` (optional) | `workflow_dispatch` | both, for `calibrate` mode | `plan`: free list of current candidates and prices. `calibrate`: evaluate the price reference and two production families on the suite within an explicit budget (at most $10). Records evidence in `calibration.json`; never changes the reviewer. |
 
 Controls carried by every repository:
 
