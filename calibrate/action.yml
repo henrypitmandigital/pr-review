@@ -56,7 +56,7 @@ runs:
             core.setFailed('Calibration requires repository write permission.');
 
     - name: Checkout trusted repository config
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: ${{ github.sha }}
         path: .pr-review/trusted
@@ -96,7 +96,7 @@ runs:
 
     - name: Checkout pinned official PR-Agent source
       if: inputs.mode == 'calibrate'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: The-PR-Agent/pr-agent
         ref: ${{ steps.pins.outputs.source_sha }}
@@ -153,7 +153,7 @@ runs:
 
     - name: Preserve calibration evidence
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: reviewer-calibration-${{ github.run_id }}
         path: ${{ runner.temp }}/research-output-${{ github.run_id }}/

@@ -55,7 +55,7 @@ runs:
     # commit; never PR code. Kept out of the caller's own workspace files.
     - name: Checkout trusted repository config
       if: steps.authorize.outputs.allowed == 'true' && inputs.authorize-only != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: ${{ github.sha }}
         path: .pr-review/trusted
