@@ -68,7 +68,7 @@ runs:
 
     - name: Checkout trusted repository config
       if: steps.authorize.outputs.allowed == 'true' && inputs.authorize-only != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: ${{ github.sha }}
         path: .pr-review/trusted
@@ -99,7 +99,7 @@ runs:
 
     - name: Checkout pinned official PR-Agent source
       if: steps.claim.outputs.due == 'true' && steps.claim.outputs.evaluation_ready == 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: The-PR-Agent/pr-agent
         ref: ${{ steps.claim.outputs.source_sha }}
@@ -162,7 +162,7 @@ runs:
 
     - name: Preserve research evidence
       if: always() && steps.claim.outputs.due == 'true'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: reviewer-research-${{ github.run_id }}
         path: ${{ runner.temp }}/research-output-${{ github.run_id }}/

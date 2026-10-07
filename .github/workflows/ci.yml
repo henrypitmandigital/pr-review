@@ -13,17 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
       - run: npm ci --ignore-scripts
       - run: npx biome check .
       - run: npm test
       - name: Checkout pinned PR-Agent source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: The-PR-Agent/pr-agent
           ref: 1d01f24f455bb879c1d9c557ad7de3d72dcc7975

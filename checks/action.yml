@@ -14,7 +14,7 @@ runs:
   using: composite
   steps:
     - name: Checkout pull request config
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: .pr-review/head
         persist-credentials: false
@@ -47,7 +47,7 @@ runs:
       run: node --input-type=module -e 'const { SOURCE_SHA } = await import("./gate.mjs"); console.log(`source_sha=${SOURCE_SHA}`)' >> "$GITHUB_OUTPUT"
 
     - name: Checkout native compatibility source
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: The-PR-Agent/pr-agent
         ref: ${{ steps.pins.outputs.source_sha }}
@@ -72,7 +72,7 @@ runs:
 
     - name: Preserve catalog preflight
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: reviewer-catalog-${{ github.run_id }}
         path: ${{ runner.temp }}/reviewer-catalog.json
