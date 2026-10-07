@@ -19,4 +19,5 @@ jobs:
       # No secrets and no paid calls: safe on pull requests.
       - uses: profplum700/pr-review/checks@v1
         with:
+          # Empty uses config.json max_call_usd; a value can only lower it.
           max-call-usd: ${{ vars.PR_REVIEW_MAX_CALL_USD }}
