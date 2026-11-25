@@ -70,11 +70,15 @@ runs:
         PR_REVIEW_MAX_CALL_USD: ${{ inputs.max-call-usd }}
       run: node "$GITHUB_ACTION_PATH/../lib/catalog-plan.mjs" "$RUNNER_TEMP/reviewer-catalog.json"
 
+    # Evidence only, kept when the check fails. A full artifact store (the
+    # organisation's allowance is shared and has no budget) warns and never
+    # fails a check whose validation passed (25 Nov 2026).
     - name: Preserve catalog preflight
-      if: always()
+      if: failure()
+      continue-on-error: true
       uses: actions/upload-artifact@v6
       with:
         name: reviewer-catalog-${{ github.run_id }}
         path: ${{ runner.temp }}/reviewer-catalog.json
         if-no-files-found: ignore
-        retention-days: 30
+        retention-days: 2

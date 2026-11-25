@@ -151,11 +151,13 @@ runs:
             core.setFailed(failureReason(error));
           }
 
+    # A full artifact store warns and never fails the run (25 Nov 2026).
     - name: Preserve calibration evidence
       if: always()
+      continue-on-error: true
       uses: actions/upload-artifact@v6
       with:
         name: reviewer-calibration-${{ github.run_id }}
         path: ${{ runner.temp }}/research-output-${{ github.run_id }}/
         if-no-files-found: ignore
-        retention-days: 90
+        retention-days: 7
