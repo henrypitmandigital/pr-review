@@ -160,11 +160,13 @@ runs:
             core.setFailed(`${failureReason(error)} Previous policy was not replaced; this cycle remains claimed to prevent duplicate spend.`);
           }
 
+    # A full artifact store warns and never fails the run (25 Nov 2026).
     - name: Preserve research evidence
       if: always() && steps.claim.outputs.due == 'true'
+      continue-on-error: true
       uses: actions/upload-artifact@v6
       with:
         name: reviewer-research-${{ github.run_id }}
         path: ${{ runner.temp }}/research-output-${{ github.run_id }}/
         if-no-files-found: ignore
-        retention-days: 90
+        retention-days: 7
